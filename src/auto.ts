@@ -51,19 +51,18 @@ async function runTask(
     );
   }
 
+  const defaultOptions: StepOptions = {
+    debug: false,
+    model: "gpt-4o",
+    strict: false,
+  };
+
+  const usableOptions = options ? { ...defaultOptions, ...options } : undefined;
+
   const result = await completeTask(page, {
     task,
     snapshot: await getSnapshot(page),
-    options: options
-      ? {
-          model: options.model ?? "gpt-4o",
-          debug: options.debug ?? false,
-          openaiApiKey: options.openaiApiKey,
-          openaiBaseUrl: options.openaiBaseUrl,
-          openaiDefaultQuery: options.openaiDefaultQuery,
-          openaiDefaultHeaders: options.openaiDefaultHeaders,
-        }
-      : undefined,
+    options: usableOptions,
   });
   return result;
 }
