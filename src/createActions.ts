@@ -4,7 +4,9 @@ import { RunnableFunctionWithParse } from "openai/lib/RunnableFunction";
 import { z } from "zod";
 
 export const createActions = (
-  page: Page
+  page: Page,
+  strict: boolean = false,
+  externalActions: Record<string, RunnableFunctionWithParse<any>> = {}
 ): Record<string, RunnableFunctionWithParse<any>> => {
   const locatorMap = new Map();
 
@@ -18,8 +20,9 @@ export const createActions = (
     return locator;
   };
 
-  return {
+  const defaultActions = {
     locateElement: {
+      strict,
       function: async (args: { cssSelector: string }) => {
         const locator = await page.locator(args.cssSelector);
 
@@ -51,6 +54,7 @@ export const createActions = (
       },
     },
     locator_evaluate: {
+      strict,
       function: async (args: { pageFunction: string; elementId: string }) => {
         return {
           result: await getLocator(args.elementId).evaluate(args.pageFunction),
@@ -82,6 +86,7 @@ export const createActions = (
       },
     },
     locator_getAttribute: {
+      strict,
       function: async (args: { attributeName: string; elementId: string }) => {
         return {
           attributeValue: await getLocator(args.elementId).getAttribute(
@@ -112,6 +117,7 @@ export const createActions = (
       },
     },
     locator_innerHTML: {
+      strict,
       function: async (args: { elementId: string }) => {
         return { innerHTML: await getLocator(args.elementId).innerHTML() };
       },
@@ -134,6 +140,7 @@ export const createActions = (
       },
     },
     locator_innerText: {
+      strict,
       function: async (args: { elementId: string }) => {
         return { innerText: await getLocator(args.elementId).innerText() };
       },
@@ -156,6 +163,7 @@ export const createActions = (
       },
     },
     locator_textContent: {
+      strict,
       function: async (args: { elementId: string }) => {
         return {
           textContent: await getLocator(args.elementId).textContent(),
@@ -180,6 +188,7 @@ export const createActions = (
       },
     },
     locator_inputValue: {
+      strict,
       function: async (args: { elementId: string }) => {
         return {
           inputValue: await getLocator(args.elementId).inputValue(),
@@ -205,6 +214,7 @@ export const createActions = (
       },
     },
     locator_blur: {
+      strict,
       function: async (args: { elementId: string }) => {
         await getLocator(args.elementId).blur();
 
@@ -229,6 +239,7 @@ export const createActions = (
       },
     },
     locator_boundingBox: {
+      strict,
       function: async (args: { elementId: string }) => {
         return await getLocator(args.elementId).boundingBox();
       },
@@ -252,6 +263,7 @@ export const createActions = (
       },
     },
     locator_check: {
+      strict,
       function: async (args: { elementId: string }) => {
         await getLocator(args.elementId).check();
 
@@ -276,6 +288,7 @@ export const createActions = (
       },
     },
     locator_uncheck: {
+      strict,
       function: async (args: { elementId: string }) => {
         await getLocator(args.elementId).uncheck();
 
@@ -300,6 +313,7 @@ export const createActions = (
       },
     },
     locator_isChecked: {
+      strict,
       function: async (args: { elementId: string }) => {
         return { isChecked: await getLocator(args.elementId).isChecked() };
       },
@@ -322,6 +336,7 @@ export const createActions = (
       },
     },
     locator_isEditable: {
+      strict,
       function: async (args: { elementId: string }) => {
         return {
           isEditable: await getLocator(args.elementId).isEditable(),
@@ -347,6 +362,7 @@ export const createActions = (
       },
     },
     locator_isEnabled: {
+      strict,
       function: async (args: { elementId: string }) => {
         return { isEnabled: await getLocator(args.elementId).isEnabled() };
       },
@@ -370,6 +386,7 @@ export const createActions = (
       },
     },
     locator_isVisible: {
+      strict,
       function: async (args: { elementId: string }) => {
         return { isVisible: await getLocator(args.elementId).isVisible() };
       },
@@ -392,6 +409,7 @@ export const createActions = (
       },
     },
     locator_clear: {
+      strict,
       function: async (args: { elementId: string }) => {
         await getLocator(args.elementId).clear();
 
@@ -416,6 +434,7 @@ export const createActions = (
       },
     },
     locator_click: {
+      strict,
       function: async (args: { elementId: string }) => {
         await getLocator(args.elementId).click();
 
@@ -440,6 +459,7 @@ export const createActions = (
       },
     },
     locator_count: {
+      strict,
       function: async (args: { elementId: string }) => {
         return { elementCount: await getLocator(args.elementId).count() };
       },
@@ -462,6 +482,7 @@ export const createActions = (
       },
     },
     locator_fill: {
+      strict,
       function: async (args: { value: string; elementId: string }) => {
         await getLocator(args.elementId).fill(args.value);
 
@@ -492,6 +513,7 @@ export const createActions = (
       },
     },
     page_goto: {
+      strict,
       function: async (args: { url: string }) => {
         return {
           url: await page.goto(args.url),
@@ -520,6 +542,7 @@ export const createActions = (
       },
     },
     expect_toBe: {
+      strict,
       function: (args: { actual: string; expected: string }) => {
         return {
           actual: args.actual,
@@ -551,6 +574,7 @@ export const createActions = (
       },
     },
     expect_notToBe: {
+      strict,
       function: (args: { actual: string; expected: string }) => {
         return {
           actual: args.actual,
@@ -582,6 +606,7 @@ export const createActions = (
       },
     },
     resultAssertion: {
+      strict,
       function: (args: { assertion: boolean }) => {
         return args;
       },
@@ -605,6 +630,7 @@ export const createActions = (
       },
     },
     resultQuery: {
+      strict,
       function: (args: { assertion: boolean }) => {
         return args;
       },
@@ -628,6 +654,7 @@ export const createActions = (
       },
     },
     resultAction: {
+      strict,
       function: () => {
         return null;
       },
@@ -643,6 +670,7 @@ export const createActions = (
       },
     },
     resultError: {
+      strict,
       function: (args: { errorMessage: string }) => {
         return {
           errorMessage: args.errorMessage,
@@ -667,5 +695,11 @@ export const createActions = (
         },
       },
     },
+  };
+
+  // Merge default actions with external actions
+  return {
+    ...defaultActions,
+    ...externalActions,
   };
 };
