@@ -19,7 +19,11 @@ export const completeTask = async (
   let lastFunctionResult: null | { errorMessage: string } | { query: string } =
     null;
 
-  const actions = createActions(page);
+  const actions = createActions(
+    page,
+    task.options?.strict,
+    task.options?.externalActions
+  );
 
   const debug = task.options?.debug ?? defaultDebug;
 
